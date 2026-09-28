@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصتي للألعاب أونلاين - Arcade Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        gaming: {
+                            dark: '#0f1016',
+                            card: '#181b28',
+                            accent: '#6366f1',
+                            glow: '#8b5cf6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0f1016;
+            color: #f3f4f6;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1016;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f46e5;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gaming-dark text-gray-100 selection:bg-indigo-500 selection:text-white">
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-gaming-dark/80 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="resetFilter()">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-gamepad text-2xl text-white"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-black tracking-wider bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">أركيد هب</span>
+                    <span class="block text-xs text-gray-400 font-semibold">منصتك الشخصية للألعاب</span>
+                </div>
+            </div>
+
+            <!-- Search & Admin Button -->
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <div class="relative hidden sm:block w-64 md:w-80">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterGames()" placeholder="ابحث عن لعبة..." class="w-full bg-gaming-card border border-gray-700 rounded-xl pr-10 pl-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+                </div>
+                <button onclick="openAdminModal()" class="flex items-center space-x-2 space-x-reverse bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-4 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/25 transition transform hover:scale-105 active:scale-95">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>إضافة لعبة جديدة</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900/40 via-purple-900/40 to-gaming-card border border-indigo-500/20 p-8 md:p-12 shadow-2xl">
+            <div class="absolute -left-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-2xl">
+                <span class="inline-block bg-indigo-500/20 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full mb-4 border border-indigo-500/30">
+                    <i class="fa-solid fa-fire text-amber-400 ml-1"></i> العب مباشرة بدون تحميل
+                </span>
+                <h1 class="text-3xl md:text-5xl font-black tracking-tight mb-4 leading-tight">
+                    استمتع بأفضل الألعاب أونلاين في مكان واحد
+                </h1>
+                <p class="text-gray-300 text-sm md:text-base mb-6 leading-relaxed">
+                    هذه منصتك الخاصة! تصفح الألعاب التي قمت بإضافتها، أو أضف ألعابك المفضلة عبر أكواد التضمين (Iframe) أو الروابط لتشاركها مع أصدقائك والعالم.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="filterByCategory('الكل')" class="category-btn active px-5 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 text-white transition shadow-md shadow-indigo-600/30">الكل</button>
+                    <button onclick="filterByCategory('أكشن')" class="category-btn px-5 py-2.5 rounded-xl text-sm font-bold bg-gaming-card hover:bg-gray-800 text-gray-300 border border-gray-700 transition">أكشن</button>
+                    <button onclick="filterByCategory('ذكاء')" class="category-btn px-5 py-2.5 rounded-xl text-sm font-bold bg-gaming-card hover:bg-gray-800 text-gray-300 border border-gray-700 transition">ذكاء وتفكير</button>
+                    <button onclick="filterByCategory('سباق')" class="category-btn px-5 py-2.5 rounded-xl text-sm font-bold bg-gaming-card hover:bg-gray-800 text-gray-300 border border-gray-700 transition">سباق وحركة</button>
+                    <button onclick="filterByCategory('مغامرة')" class="category-btn px-5 py-2.5 rounded-xl text-sm font-bold bg-gaming-card hover:bg-gray-800 text-gray-300 border border-gray-700 transition">مغامرة</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content / Games Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12 flex-grow w-full">
+        <div class="flex items-center justify-between mb-8">
+            <h2 id="sectionTitle" class="text-xl md:text-2xl font-bold flex items-center space-x-2 space-x-reverse">
+                <i class="fa-solid fa-gamepad text-indigo-400"></i>
+                <span>الألعاب المتاحة حالياً</span>
+                <span id="gameCountBadge" class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-500/30 mr-2">0</span>
+            </h2>
+        </div>
+
+        <!-- Games Grid -->
+        <div id="gamesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Game cards will be injected dynamically via JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-20 bg-gaming-card/40 border border-dashed border-gray-800 rounded-3xl mt-6">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 text-3xl">
+                <i class="fa-solid fa-ghost"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-300 mb-1">لا توجد ألعاب مضافة حالياً</h3>
+            <p class="text-gray-500 text-sm mb-6">كن أول من يضيف لعبة رائعة إلى المنصة!</p>
+            <button onclick="openAdminModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">
+                إضافة لعبة الآن
+            </button>
+        </div>
+    </main>
+
+    <!-- Game Player Modal -->
+    <div id="gameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md hidden p-2 sm:p-6">
+        <div class="bg-gaming-card border border-gray-800 w-full max-w-6xl h-[92vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden relative">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between bg-gaming-dark/50">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalGameTitle" class="text-lg font-bold text-white">اسم اللعبة</h3>
+                        <span id="modalGameCategory" class="text-xs text-indigo-400 font-semibold">التصنيف</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <button onclick="toggleFullscreen()" title="ملء الشاشة" class="w-10 h-10 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 flex items-center justify-center transition">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                    <button onclick="closeGameModal()" title="إغلاق" class="w-10 h-10 rounded-xl bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/30 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body (Game Container) -->
+            <div id="gameContainer" class="flex-grow bg-black relative flex items-center justify-center overflow-hidden">
+                <!-- Iframe or embed will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Add Game Modal -->
+    <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
+        <div class="bg-gaming-card border border-gray-800 w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-800">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold">
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">إضافة لعبة جديدة للمنصة</h3>
+                </div>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="addGameForm" onsubmit="handleGameSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-1">اسم اللعبة</label>
+                    <input type="text" id="gameTitle" required placeholder="مثال: سباق السيارات السريع" class="w-full bg-gaming-dark border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-1">التصنيف</label>
+                        <select id="gameCategory" class="w-full bg-gaming-dark border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition">
+                            <option value="أكشن">أكشن</option>
+                            <option value="ذكاء">ذكاء وتفكير</option>
+                            <option value="سباق">سباق وحركة</option>
+                            <option value="مغامرة">مغامرة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-1">رابط صورة الغلاف (صورة مصغرة)</label>
+                        <input type="url" id="gameImage" required placeholder="https://example.com/image.jpg" class="w-full bg-gaming-dark border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-1">رابط اللعبة (رابط مباشر HTML5 أو كود Iframe)</label>
+                    <textarea id="gameUrl" rows="3" required placeholder="ضع رابط اللعبة المباشر (مثل https://...) أو كود التضمين <iframe src=...></iframe>" class="w-full bg-gaming-dark border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">ملاحظة: يمكنك وضع رابط ويب مباشر للعبة أو كود iframe متكامل.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-1">وصف مختصر للعبة</label>
+                    <textarea id="gameDesc" rows="2" placeholder="اكتب وصفاً سريعاً يشوق اللاعبين..." class="w-full bg-gaming-dark border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 space-x-reverse pt-4 border-t border-gray-800">
+                    <button type="button" onclick="closeAdminModal()" class="px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-bold transition">إلغاء</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-bold shadow-lg shadow-indigo-600/30 transition">حفظ ونشر اللعبة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-gaming-dark py-8 mt-auto text-center text-sm text-gray-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>جميع الحقوق محفوظة &copy; 2026 - منصة أركيد هب للألعاب</p>
+            <div class="flex items-center space-x-4 space-x-reverse text-gray-400">
+                <span class="flex items-center space-x-1 space-x-reverse"><i class="fa-solid fa-shield-halved text-indigo-400"></i> آمنة ومجانية 100%</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Default Sample Games if storage is empty
+        const defaultGames = [
+            {
+                id: 1,
+                title: 'لعبة الثعبان الكلاسيكية',
+                category: 'ذكاء',
+                image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop',
+                url: 'https://cdn.jsdelivr.net/gh/surjithctly/arcade-games/snake/index.html',
+                desc: 'لعبة الثعبان الممتعة والكلاسيكية، اجمع التفاح وتجنب الاصطدام بالجدران.'
+            },
+            {
+                id: 2,
+                title: 'تحدي إكس أو (Tic Tac Toe)',
+                category: 'ذكاء',
+                image: 'https://images.unsplash.com/photo-1612287233002-91d0f533a8c2?q=80&w=600&auto=format&fit=crop',
+                url: 'https://playtictactoe.org/',
+                desc: 'العب لعبة إكس أو الشهيرة ضد صديقك أو ضد الكمبيوتر.'
+            },
+            {
+                id: 3,
+                title: 'لعبة الذاكرة البصرية',
+                category: 'مغامرة',
+                image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=600&auto=format&fit=crop',
+                url: 'https://tetris.com/play-tetris',
+                desc: 'لعبة تتريس الغنية عن التعريف لاختبار سرعة بديهتك وتركيزك.'
+            }
+        ];
+
+        // Load games from localStorage or use defaults
+        let games = JSON.parse(localStorage.getItem('arcade_hub_games')) || defaultGames;
+        let currentCategory = 'الكل';
+
+        // Initialize App on Load
+        window.onload = function() {
+            renderGames(games);
+        };
+
+        // Render Games Function
+        function renderGames(gamesList) {
+            const grid = document.getElementById('gamesGrid');
+            const emptyState = document.getElementById('emptyState');
+            const badge = document.getElementById('gameCountBadge');
+            
+            badge.textContent = gamesList.length;
+            grid.innerHTML = '';
+
+            if (gamesList.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            gamesList.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'group bg-gaming-card border border-gray-800 rounded-3xl overflow-hidden hover:border-indigo-500/50 transition-all duration-300 shadow-xl flex flex-col transform hover:-translate-y-1';
+                card.innerHTML = `
+                    <div class="relative h-48 overflow-hidden bg-gray-900 cursor-pointer" onclick="playGame(${game.id})">
+                        <img src="${game.image}" alt="${game.title}" onerror="this.src='https://placehold.co/600x400/181b28/ffffff?text=Game+Image'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gaming-card via-transparent to-transparent opacity-80"></div>
+                        <span class="absolute top-3 right-3 bg-gaming-dark/80 backdrop-blur-md text-indigo-300 text-xs font-bold px-3 py-1 rounded-full border border-gray-700">
+                            ${game.category}
+                        </span>
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition bg-black/40 backdrop-blur-[2px]">
+                            <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/50 transform scale-75 group-hover:scale-100 transition">
+                                <i class="fa-solid fa-play text-xl ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <h3 class="text-lg font-bold text-white mb-1 group-hover:text-indigo-400 transition cursor-pointer" onclick="playGame(${game.id})">${game.title}</h3>
+                        <p class="text-gray-400 text-xs mb-4 line-clamp-2 leading-relaxed flex-grow">${game.desc || 'لا يوجد وصف متاح لهذه اللعبة.'}</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-800 mt-auto">
+                            <button onclick="playGame(${game.id})" class="w-full bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 font-bold py-2 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-2 space-x-reverse">
+                                <i class="fa-solid fa-gamepad"></i>
+                                <span>العب الآن</span>
+                            </button>
+                            <button onclick="deleteGame(${game.id})" title="حذف اللعبة" class="mr-2 text-gray-500 hover:text-rose-400 p-2 rounded-xl hover:bg-rose-500/10 transition">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter by Category
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Update button styles
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.textContent.trim() === category || (category === 'الكل' && btn.textContent.trim() === 'الكل')) {
+                    btn.className = 'category-btn active px-5 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 text-white transition shadow-md shadow-indigo-600/30';
+                } else {
+                    btn.className = 'category-btn px-5 py-2.5 rounded-xl text-sm font-bold bg-gaming-card hover:bg-gray-800 text-gray-300 border border-gray-700 transition';
+                }
+            });
+
+            document.getElementById('sectionTitle').querySelector('span:nth-child(2)').textContent = category === 'الكل' ? 'الألعاب المتاحة حالياً' : `ألعاب تصنيف: ${category}`;
+
+            applyFilters();
+        }
+
+        // Search Filter
+        function filterGames() {
+            applyFilters();
+        }
+
+        // Combine Category & Search Filters
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = games.filter(game => {
+                const matchesCategory = currentCategory === 'الكل' || game.category === currentCategory;
+                const matchesSearch = game.title.toLowerCase().includes(query) || (game.desc && game.desc.toLowerCase().includes(query));
+                return matchesCategory && matchesSearch;
+            });
+
+            renderGames(filtered);
+        }
+
+        // Reset Filter
+        function resetFilter() {
+            document.getElementById('searchInput').value = '';
+            filterByCategory('الكل');
+        }
+
+        // Play Game Modal Handler
+        function playGame(id) {
+            const game = games.find(g => g.id === id);
+            if (!game) return;
+
+            document.getElementById('modalGameTitle').textContent = game.title;
+            document.getElementById('modalGameCategory').textContent = game.category;
+            
+            const container = document.getElementById('gameContainer');
+            container.innerHTML = '';
+
+            // Check if URL is an iframe code or direct link
+            if (game.url.trim().startsWith('<iframe')) {
+                container.innerHTML = game.url;
+                const iframe = container.querySelector('iframe');
+                if (iframe) {
+                    iframe.className = 'w-full h-full border-0';
+                }
+            } else {
+                const iframe = document.createElement('iframe');
+                iframe.src = game.url;
+                iframe.className = 'w-full h-full border-0';
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.setAttribute('allow', 'autoplay; fullscreen; gamepad');
+                container.appendChild(iframe);
+            }
+
+            document.getElementById('gameModal').classList.remove('hidden');
+        }
+
+        // Close Game Modal
+        function closeGameModal() {
+            document.getElementById('gameModal').classList.add('hidden');
+            document.getElementById('gameContainer').innerHTML = '';
+        }
+
+        // Admin Modal Handlers
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('addGameForm').reset();
+        }
+
+        // Handle Game Submission from Admin Form
+        function handleGameSubmit(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('gameTitle').value.trim();
+            const category = document.getElementById('gameCategory').value;
+            const image = document.getElementById('gameImage').value.trim();
+            let url = document.getElementById('gameUrl').value.trim();
+            const desc = document.getElementById('gameDesc').value.trim();
+
+            const newGame = {
+                id: Date.now(),
+                title,
+                category,
+                image,
+                url,
+                desc
+            };
+
+            games.unshift(newGame);
+            localStorage.setItem('arcade_hub_games', JSON.stringify(games));
+
+            closeAdminModal();
+            filterByCategory(currentCategory);
+        }
+
+        // Delete Game
+        function deleteGame(id) {
+            if (confirm('هل أنت متأكد من حذف هذه اللعبة من المنصة؟')) {
+                games = games.filter(g => g.id !== id);
+                localStorage.setItem('arcade_hub_games', JSON.stringify(games));
+                applyFilters();
+            }
+        }
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            const modal = document.getElementById('gameModal');
+            if (!document.fullscreenElement) {
+                modal.requestFullscreen().catch(err => {
+                    console.error("Error attempting to enable fullscreen:", err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
